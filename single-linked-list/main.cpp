@@ -42,8 +42,7 @@ void Test4() {
     }
 
     // Вставка элемента после указанной позиции
-    {
-        // Вставка в пустой список
+    {  // Вставка в пустой список
         {
             SingleLinkedList<int> lst;
             const auto inserted_item_pos = lst.InsertAfter(lst.before_begin(), 123);
@@ -117,4 +116,33 @@ void Test4() {
             SingleLinkedList<int> lst{1, 2, 3, 4};
             const auto& const_lst = lst;
             const auto item_after_erased = lst.EraseAfter(const_lst.cbefore_begin());
-            assert((lst == SingleLinkedList<int
+            assert((lst == SingleLinkedList<int>{2, 3, 4}));
+            assert(item_after_erased == lst.begin());
+        }
+        {
+            SingleLinkedList<int> lst{1, 2, 3, 4};
+            const auto item_after_erased = lst.EraseAfter(lst.cbegin());
+            assert((lst == SingleLinkedList<int>{1, 3, 4}));
+            assert(item_after_erased == (++lst.begin()));
+        }
+        {
+            SingleLinkedList<int> lst{1, 2, 3, 4};
+            const auto item_after_erased = lst.EraseAfter(++(++lst.cbegin()));
+            assert((lst == SingleLinkedList<int>{1, 2, 3}));
+            assert(item_after_erased == lst.end());
+        }
+        {
+            SingleLinkedList<DeletionSpy> list{DeletionSpy{}, DeletionSpy{}, DeletionSpy{}};
+            auto after_begin = ++list.begin();
+            int deletion_counter = 0;
+            after_begin->deletion_counter_ptr = &deletion_counter;
+            assert(deletion_counter == 0u);
+            list.EraseAfter(list.cbegin());
+            assert(deletion_counter == 1u);
+        }
+    }
+}
+
+int main() {
+    Test4();
+}
